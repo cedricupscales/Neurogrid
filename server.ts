@@ -124,7 +124,10 @@ async function startServer() {
   app.get("/api/report", (req, res) => {
     const tasks = db.prepare("SELECT * FROM tasks").all();
     const xpEvents = db.prepare("SELECT * FROM xp_events").all();
-    res.json({ tasks, xpEvents });
+    res.json({ 
+      tasks: tasks.map((t: any) => ({ ...t, completed: !!t.completed })), 
+      xpEvents 
+    });
   });
 
   // Vite middleware for development

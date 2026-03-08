@@ -1,11 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Task, Quadrant, Domain } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-
 export const parseBrainDump = async (text: string): Promise<Partial<Task>[]> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
   const response = await ai.models.generateContent({
-    model: "gemini-3.1-pro-preview",
+    model: "gemini-3-flash-preview",
     contents: `Parse the following brain-dump text into a list of structured tasks for a productivity app. 
     For each task, provide: title, description, deadline (ISO string or null), domain (Physical, Business, Academic, Social, Personal, Financial), urgency (1-10), importance (1-10), and estimated duration in minutes.
     
@@ -49,8 +48,9 @@ const calculateQuadrant = (urgency: number, importance: number): Quadrant => {
 };
 
 export const suggestSchedule = async (tasks: Task[]): Promise<{ taskId: string; start: string; end: string }[]> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
   const response = await ai.models.generateContent({
-    model: "gemini-3.1-pro-preview",
+    model: "gemini-3-flash-preview",
     contents: `Given these tasks, propose a weekly schedule (timeblocks). 
     Tasks: ${JSON.stringify(tasks.filter(t => !t.completed))}
     Current time: ${new Date().toISOString()}
@@ -77,12 +77,17 @@ export const suggestSchedule = async (tasks: Task[]): Promise<{ taskId: string; 
   return JSON.parse(response.text || "[]");
 };
 
-export const chatWithGemini = async (message: string, history: any[]) => {
+export const chatWithGemini = async (message: string, history: { role: 'user' | 'bot'; content: string }[]) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
   const chat = ai.chats.create({
-    model: "gemini-3.1-pro-preview",
+    model: "gemini-3-flash-preview",
     config: {
       systemInstruction: "You are a neuro-productivity architect for entrepreneurs. Help them organize their cognitive load, optimize their neural pathways (workflow), and maintain peak mental performance. Use neuro/bio metaphors where appropriate.",
     },
+    history: history.map(m => ({
+      role: m.role === 'bot' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }))
   });
   
   const response = await chat.sendMessage({ message });

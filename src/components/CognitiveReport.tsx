@@ -37,9 +37,9 @@ export const CognitiveReport = ({ tasks, xpEvents, skills }: { tasks: Task[], xp
 
   return (
     <div className="grid grid-cols-3 gap-6">
-      <Card className="col-span-1 flex flex-col gap-4">
+      <Card className="col-span-1 flex flex-col gap-4 min-w-0">
         <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Synapse Distribution</h3>
-        <div className="h-[200px]">
+        <div className="h-[200px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -70,9 +70,9 @@ export const CognitiveReport = ({ tasks, xpEvents, skills }: { tasks: Task[], xp
         </div>
       </Card>
 
-      <Card className="col-span-1 flex flex-col gap-4">
+      <Card className="col-span-1 flex flex-col gap-4 min-w-0">
         <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Cortex Map</h3>
-        <div className="h-[200px]">
+        <div className="h-[200px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={skillData}>
               <PolarGrid stroke="rgba(255,255,255,0.1)" />
@@ -89,9 +89,9 @@ export const CognitiveReport = ({ tasks, xpEvents, skills }: { tasks: Task[], xp
         </div>
       </Card>
 
-      <Card className="col-span-1 flex flex-col gap-4">
+      <Card className="col-span-1 flex flex-col gap-4 min-w-0">
         <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Signal Velocity</h3>
-        <div className="h-[200px]">
+        <div className="h-[200px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={last7Days}>
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} />

@@ -38,7 +38,7 @@ export const GamificationStats = ({ stats }: { stats: UserStats }) => {
         />
       </div>
 
-      <div className="h-[240px] w-full">
+      <div className="h-[240px] w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
             <PolarGrid stroke="rgba(255,255,255,0.05)" />

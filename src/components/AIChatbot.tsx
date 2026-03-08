@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Button } from './UI';
 import { chatWithGemini } from '../services/ai';
 import ReactMarkdown from 'react-markdown';
+import { clsx } from 'clsx';
 
 export const AIChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -117,5 +118,3 @@ export const AIChatbot = () => {
     </div>
   );
 };
-
-import { clsx } from 'clsx';
