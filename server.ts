@@ -16,7 +16,7 @@ db.exec(`
     xp INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
     streak INTEGER DEFAULT 0,
-    last_active TEXT
+    lastActive TEXT
   );
 
   CREATE TABLE IF NOT EXISTS tasks (
@@ -67,24 +67,39 @@ async function startServer() {
 
   // API Routes
   app.get("/api/user", (req, res) => {
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get("default-user");
-    const skills = db.prepare("SELECT * FROM skill_distribution").all();
-    res.json({ ...user, skills: skills.reduce((acc: any, s: any) => ({ ...acc, [s.domain]: s.value }), {}) });
+    try {
+      const user = db.prepare("SELECT * FROM users WHERE id = ?").get("default-user");
+      const skills = db.prepare("SELECT * FROM skill_distribution").all();
+      res.json({ ...user, skills: skills.reduce((acc: any, s: any) => ({ ...acc, [s.domain]: s.value }), {}) });
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
   });
 
   app.get("/api/tasks", (req, res) => {
-    const tasks = db.prepare("SELECT * FROM tasks ORDER BY createdAt DESC").all();
-    res.json(tasks.map((t: any) => ({ ...t, completed: !!t.completed })));
+    try {
+      const tasks = db.prepare("SELECT * FROM tasks ORDER BY createdAt DESC").all();
+      res.json(tasks.map((t: any) => ({ ...t, completed: !!t.completed })));
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      res.status(500).json({ error: "Failed to fetch tasks" });
+    }
   });
 
   app.post("/api/tasks", (req, res) => {
-    const task = req.body;
-    const stmt = db.prepare(`
-      INSERT INTO tasks (id, title, description, deadline, domain, urgency, importance, duration, quadrant, completed, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    stmt.run(task.id, task.title, task.description, task.deadline, task.domain, task.urgency, task.importance, task.duration, task.quadrant, task.completed ? 1 : 0, task.createdAt);
-    res.json({ success: true });
+    try {
+      const task = req.body;
+      const stmt = db.prepare(`
+        INSERT INTO tasks (id, title, description, deadline, domain, urgency, importance, duration, quadrant, completed, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      stmt.run(task.id, task.title, task.description, task.deadline, task.domain, task.urgency, task.importance, task.duration, task.quadrant, task.completed ? 1 : 0, task.createdAt);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error creating task:", error);
+      res.status(500).json({ error: "Failed to create task" });
+    }
   });
 
   app.put("/api/tasks/:id", (req, res) => {
@@ -122,12 +137,17 @@ async function startServer() {
   });
 
   app.get("/api/report", (req, res) => {
-    const tasks = db.prepare("SELECT * FROM tasks").all();
-    const xpEvents = db.prepare("SELECT * FROM xp_events").all();
-    res.json({ 
-      tasks: tasks.map((t: any) => ({ ...t, completed: !!t.completed })), 
-      xpEvents 
-    });
+    try {
+      const tasks = db.prepare("SELECT * FROM tasks").all();
+      const xpEvents = db.prepare("SELECT * FROM xp_events").all();
+      res.json({ 
+        tasks: tasks.map((t: any) => ({ ...t, completed: !!t.completed })), 
+        xpEvents 
+      });
+    } catch (error) {
+      console.error("Error fetching report:", error);
+      res.status(500).json({ error: "Failed to fetch report" });
+    }
   });
 
   // Vite middleware for development
