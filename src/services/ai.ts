@@ -1,8 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Task, Quadrant, Domain } from "../types";
 
+const getAI = () => new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+
 export const parseBrainDump = async (text: string): Promise<Partial<Task>[]> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Parse the following brain-dump text into a list of structured tasks for a productivity app. 
@@ -48,7 +50,7 @@ const calculateQuadrant = (urgency: number, importance: number): Quadrant => {
 };
 
 export const suggestSchedule = async (tasks: Task[]): Promise<{ taskId: string; start: string; end: string }[]> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Given these tasks, propose a weekly schedule (timeblocks). 
@@ -78,18 +80,24 @@ export const suggestSchedule = async (tasks: Task[]): Promise<{ taskId: string; 
 };
 
 export const chatWithGemini = async (message: string, history: { role: 'user' | 'bot'; content: string }[]) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-  const chat = ai.chats.create({
-    model: "gemini-3-flash-preview",
-    config: {
-      systemInstruction: "You are a neuro-productivity architect for entrepreneurs. Help them organize their cognitive load, optimize their neural pathways (workflow), and maintain peak mental performance. Use neuro/bio metaphors where appropriate.",
-    },
-    history: history.map(m => ({
-      role: m.role === 'bot' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }))
-  });
+  const ai = getAI();
   
-  const response = await chat.sendMessage({ message });
-  return response.text;
+  try {
+    const chat = ai.chats.create({
+      model: "gemini-3-flash-preview",
+      config: {
+        systemInstruction: "You are a neuro-productivity architect for entrepreneurs. Help them organize their cognitive load, optimize their neural pathways (workflow), and maintain peak mental performance. Use neuro/bio metaphors where appropriate.",
+      },
+      history: history.map(m => ({
+        role: m.role === 'bot' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }))
+    });
+    
+    const response = await chat.sendMessage({ message });
+    return response.text;
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    throw error;
+  }
 };

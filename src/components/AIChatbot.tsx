@@ -32,8 +32,9 @@ export const AIChatbot = () => {
     try {
       const response = await chatWithGemini(userMsg, messages);
       setMessages(prev => [...prev, { role: 'bot', content: response || "I'm sorry, I couldn't process that." }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'bot', content: "Error connecting to AI. Please check your API key." }]);
+    } catch (error: any) {
+      console.error("Chatbot Error:", error);
+      setMessages(prev => [...prev, { role: 'bot', content: "Neural link interrupted. Please ensure your environment is configured correctly." }]);
     } finally {
       setLoading(false);
     }

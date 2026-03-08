@@ -56,11 +56,16 @@ export default function App() {
   };
 
   const handleGeneratePlan = async (text: string) => {
-    const parsedTasks = await parseBrainDump(text);
-    for (const task of parsedTasks) {
-      await createTask(task as Task);
+    try {
+      const parsedTasks = await parseBrainDump(text);
+      for (const task of parsedTasks) {
+        await createTask(task as Task);
+      }
+      await loadData();
+    } catch (error: any) {
+      console.error("Failed to generate plan:", error);
+      alert("Neural Sync failed. Please check your API key or try again.");
     }
-    await loadData();
   };
 
   const handleCompleteTask = async (id: string) => {

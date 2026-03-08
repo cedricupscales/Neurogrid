@@ -26,8 +26,9 @@ export const WeeklyCalendar = ({ tasks, onRefresh }: { tasks: Task[], onRefresh:
         });
       }
       onRefresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to suggest schedule", error);
+      alert("Neural Optimization failed. Please check your API key.");
     } finally {
       setLoading(false);
     }
