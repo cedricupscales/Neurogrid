@@ -30,9 +30,9 @@ db.exec(`
     duration INTEGER,
     quadrant TEXT,
     completed INTEGER DEFAULT 0,
-    timeblock_start TEXT,
-    timeblock_end TEXT,
-    created_at TEXT
+    timeblockStart TEXT,
+    timeblockEnd TEXT,
+    createdAt TEXT
   );
 
   CREATE TABLE IF NOT EXISTS xp_events (
@@ -73,14 +73,14 @@ async function startServer() {
   });
 
   app.get("/api/tasks", (req, res) => {
-    const tasks = db.prepare("SELECT * FROM tasks ORDER BY created_at DESC").all();
+    const tasks = db.prepare("SELECT * FROM tasks ORDER BY createdAt DESC").all();
     res.json(tasks.map((t: any) => ({ ...t, completed: !!t.completed })));
   });
 
   app.post("/api/tasks", (req, res) => {
     const task = req.body;
     const stmt = db.prepare(`
-      INSERT INTO tasks (id, title, description, deadline, domain, urgency, importance, duration, quadrant, completed, created_at)
+      INSERT INTO tasks (id, title, description, deadline, domain, urgency, importance, duration, quadrant, completed, createdAt)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     stmt.run(task.id, task.title, task.description, task.deadline, task.domain, task.urgency, task.importance, task.duration, task.quadrant, task.completed ? 1 : 0, task.createdAt);

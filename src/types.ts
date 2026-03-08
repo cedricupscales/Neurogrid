@@ -1,5 +1,3 @@
-import { Type } from "@google/genai";
-
 export enum Domain {
   PHYSICAL = "Physical",
   BUSINESS = "Business",

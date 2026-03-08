@@ -4,15 +4,17 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } fro
 import { motion } from 'motion/react';
 
 export const GamificationStats = ({ stats }: { stats: UserStats }) => {
+  console.log("GamificationStats received:", stats);
+  
   const chartData = Object.entries(stats.skills).map(([name, value]) => ({
     subject: name,
     A: value,
-    fullMark: Math.max(...Object.values(stats.skills), 100),
+    fullMark: Math.max(...Object.values(stats.skills), 10), // Lower fullMark if all are 0
   }));
 
   const xpToNextLevel = 1000;
   const currentXP = stats.xp % xpToNextLevel;
-  const progress = (currentXP / xpToNextLevel) * 100;
+  const progress = Math.min(Math.max((currentXP / xpToNextLevel) * 100, 0), 100);
 
   return (
     <div className="flex flex-col gap-8">
@@ -38,23 +40,29 @@ export const GamificationStats = ({ stats }: { stats: UserStats }) => {
         />
       </div>
 
-      <div className="h-[240px] w-full min-w-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-            <PolarGrid stroke="rgba(255,255,255,0.05)" />
-            <PolarAngleAxis 
-              dataKey="subject" 
-              tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 700 }} 
-            />
-            <Radar
-              name="Skills"
-              dataKey="A"
-              stroke="#22C55E"
-              fill="#22C55E"
-              fillOpacity={0.2}
-            />
-          </RadarChart>
-        </ResponsiveContainer>
+      <div className="h-[240px] w-full">
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+              <PolarGrid stroke="rgba(255,255,255,0.05)" />
+              <PolarAngleAxis 
+                dataKey="subject" 
+                tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 700 }} 
+              />
+              <Radar
+                name="Skills"
+                dataKey="A"
+                stroke="#22C55E"
+                fill="#22C55E"
+                fillOpacity={0.2}
+              />
+            </RadarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full flex items-center justify-center text-white/20 text-[10px] uppercase tracking-widest">
+            Initializing Neural Map...
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

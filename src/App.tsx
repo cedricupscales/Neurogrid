@@ -4,17 +4,17 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { clsx } from 'clsx';
 import { LayoutDashboard, Brain, Calendar, Activity, User, LogOut, Kanban, BarChart3, Settings, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Task, UserStats, XPEvent } from './types';
+import { Task, UserStats, XPEvent, Domain, Quadrant } from './types';
 import { fetchUser, fetchTasks, createTask, updateTask, deleteTask, addXP, fetchReport } from './services/api';
-import { parseBrainDump } from './services/ai';
 import { BrainDumpInput } from './components/BrainDumpInput';
 import { EisenhowerBoard } from './components/EisenhowerBoard';
 import { WeeklyCalendar } from './components/WeeklyCalendar';
 import { GamificationStats } from './components/GamificationStats';
 import { CognitiveReport } from './components/CognitiveReport';
-import { AIChatbot } from './components/AIChatbot';
+import { FocusTimer } from './components/FocusTimer';
 import { Card, Button } from './components/UI';
 import { DOMAIN_COLORS } from './constants';
 
@@ -55,17 +55,22 @@ export default function App() {
     setReportData(report);
   };
 
-  const handleGeneratePlan = async (text: string) => {
-    try {
-      const parsedTasks = await parseBrainDump(text);
-      for (const task of parsedTasks) {
-        await createTask(task as Task);
-      }
-      await loadData();
-    } catch (error: any) {
-      console.error("Failed to generate plan:", error);
-      alert("Neural Sync failed. Please check your API key or try again.");
-    }
+  const handleAddTask = async (title: string) => {
+    const newTask: Task = {
+      id: Math.random().toString(36).substr(2, 9),
+      title,
+      description: 'Quickly added task',
+      deadline: new Date().toISOString(),
+      domain: Domain.PERSONAL,
+      urgency: 5,
+      importance: 5,
+      duration: 30,
+      quadrant: Quadrant.DO_NOW,
+      completed: false,
+      createdAt: new Date().toISOString()
+    };
+    await createTask(newTask);
+    await loadData();
   };
 
   const handleCompleteTask = async (id: string) => {
@@ -106,7 +111,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight text-white">neurogrid</h1>
-            <p className="text-[10px] uppercase tracking-widest text-[#22C55E] font-bold">Neural Sync Active</p>
+            <p className="text-[10px] uppercase tracking-widest text-[#22C55E] font-bold">Cortex Sync Active</p>
           </div>
         </div>
 
@@ -161,8 +166,8 @@ export default function App() {
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3 bg-gradient-to-r from-white/5 to-white/[0.02] px-4 py-2 rounded-full border border-white/5">
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#22C55E] to-[#4ADE80] animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Neural Link Stable</span>
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#22C55E] to-[#4ADE80] shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Cortex Sync Active</span>
             </div>
           </div>
         </header>
@@ -183,7 +188,7 @@ export default function App() {
                   <div className="col-span-8 flex flex-col gap-8">
                     <section>
                       <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-white/30 mb-4">Fast Capture</h3>
-                      <BrainDumpInput onGenerate={handleGeneratePlan} />
+                      <BrainDumpInput onAdd={handleAddTask} />
                     </section>
                     <section className="flex-1 min-h-0">
                       <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-white/30 mb-4">Critical Matrix</h3>
@@ -243,10 +248,8 @@ export default function App() {
         </div>
       </main>
 
-      {/* AI Chatbot */}
-      <AIChatbot />
+      {/* Focus Timer */}
+      <FocusTimer />
     </div>
   );
 }
-
-import { clsx } from 'clsx';
