@@ -6,8 +6,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const Card = ({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) => (
-  <div className={cn("bg-[#1E1E1E] border border-white/5 rounded-xl p-4 shadow-lg", className)} style={style}>
+export const Card = ({ children, className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("bg-[#1E1E1E] border border-white/5 rounded-xl p-4 shadow-lg", className)} style={style} {...props}>
     {children}
   </div>
 );
