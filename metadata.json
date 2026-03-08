@@ -1,0 +1,8 @@
+{
+  "name": "neurogrid",
+  "description": "A gamified, AI-powered neural control center for entrepreneurs featuring brain-dump parsing, Eisenhower matrix sorting, and cognitive timeblocking.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
